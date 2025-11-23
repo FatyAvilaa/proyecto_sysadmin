@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS clasificaciones (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(255),
+    resultado VARCHAR(255),
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

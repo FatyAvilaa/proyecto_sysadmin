@@ -1,0 +1,57 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15
+    container_name: db
+    restart: always
+    environment:
+      POSTGRES_USER_FILE: /run/secrets/postgres_user
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      POSTGRES_DB_FILE: /run/secrets/postgres_db
+    secrets:
+      - postgres_user
+      - postgres_password
+      - postgres_db
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  backend:
+    build: ./backend
+    container_name: backend
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      DATABASE_URL_FILE: /run/secrets/db_url
+      CLASSIFIER_URL: http://classifier:8000/predict
+    secrets:
+      - db_url
+    depends_on:
+      - db
+      - classifier
+    volumes:
+      - ./backend:/app
+
+  classifier:
+    build: ./classifier
+    container_name: classifier
+    restart: always
+    ports:
+      - "8000:8000"
+
+secrets:
+  postgres_user:
+    file: ./secrets/postgres_user.txt
+  postgres_password:
+    file: ./secrets/postgres_password.txt
+  postgres_db:
+    file: ./secrets/postgres_db.txt
+  db_url:
+    file: ./secrets/db_url.txt
+
+volumes:
+  db_data:

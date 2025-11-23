@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clasificador de Animales - IA Profesional</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --accent-color: #4cc9f0;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4bb543;
+            --warning-color: #ffcc00;
+            --danger-color: #dc3545;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7ff;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            font-size: 2rem;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+        }
+
+        nav a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 4rem 0;
+            background: linear-gradient(rgba(67, 97, 238, 0.9), rgba(58, 12, 163, 0.9)), url('https://images.unsplash.com/photo-1470115636492-6d2b56f9146d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            text-align: center;
+        }
+
+        .hero h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+        }
+
+        /* Upload Section */
+        .upload-section {
+            background-color: white;
+            padding: 3rem 0;
+            margin: 2rem auto;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            max-width: 800px;
+        }
+
+        .upload-container {
+            padding: 0 2rem;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--primary-color);
+            border-radius: 10px;
+            padding: 3rem 2rem;
+            text-align: center;
+            margin: 2rem 0;
+            transition: var(--transition);
+            background-color: #f8faff;
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            background-color: #eef2ff;
+        }
+
+        .upload-area i {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .upload-area h3 {
+            margin-bottom: 1rem;
+            color: var(--dark-color);
+        }
+
+        .upload-area p {
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-label {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+        }
+
+        .file-label:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .selected-file {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #e8f4fd;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .selected-file.active {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .classify-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 2rem;
+        }
+
+        .classify-btn:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .classify-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: none;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .spinner.active {
+            display: block;
+        }
+
+        .spinner i {
+            font-size: 2rem;
+            color: var(--primary-color);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Results Section */
+        .results-section {
+            background-color: white;
+            padding: 3rem 0;
+            margin: 2rem auto;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            max-width: 800px;
+            display: none;
+        }
+
+        .results-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .animal-image {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 10px;
+            margin: 0 auto 2rem;
+            display: block;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .prediction-result {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+            border-radius: 10px;
+            margin: 2rem 0;
+            border-left: 5px solid var(--success-color);
+        }
+
+        .prediction-label {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .prediction-confidence {
+            font-size: 1.3rem;
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        .confidence-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: var(--success-color);
+            color: white;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        .error-message {
+            text-align: center;
+            padding: 2rem;
+            background-color: #ffebee;
+            border-radius: 10px;
+            margin: 2rem 0;
+            border-left: 5px solid var(--danger-color);
+            color: var(--danger-color);
+        }
+
+        /* Info Section */
+        .info-section {
+            padding: 4rem 0;
+            background-color: white;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: var(--dark-color);
+        }
+
+        .section-title h2 {
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .section-title p {
+            color: #666;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .feature-card {
+            background-color: #f8f9fa;
+            padding: 2rem;
+            border-radius: 10px;
+            text-align: center;
+            transition: var(--transition);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-card i {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-card h3 {
+            margin-bottom: 1rem;
+            color: var(--dark-color);
+        }
+
+        .animal-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .animal-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: var(--transition);
+        }
+
+        .animal-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .animal-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .animal-card .card-content {
+            padding: 1rem;
+        }
+
+        .animal-card h4 {
+            margin-bottom: 0.5rem;
+            color: var(--dark-color);
+            text-transform: capitalize;
+        }
+
+        .animal-card p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            padding: 4rem 0;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 2rem 1rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-card i {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card .number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .label {
+            font-size: 1.1rem;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 3rem 0 1.5rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-column h3 {
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 40px;
+            height: 2px;
+            background-color: var(--primary-color);
+        }
+
+        .footer-column ul {
+            list-style: none;
+        }
+
+        .footer-column ul li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-column a {
+            color: #ccc;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-column a:hover {
+            color: white;
+            padding-left: 5px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            background-color: var(--primary-color);
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            nav ul {
+                gap: 1rem;
+            }
+            
+            .hero h2 {
+                font-size: 2rem;
+            }
+            
+            .upload-container {
+                padding: 0 1rem;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+            }
+            
+            .results-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-paw"></i>
+                    <h1>Clasificador de Animales</h1>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="#inicio">Inicio</a></li>
+                        <li><a href="#clasificar">Clasificar</a></li>
+                        <li><a href="#informacion">Información</a></li>
+                        <li><a href="#estadisticas">Estadísticas</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="inicio">
+        <div class="container">
+            <h2>Clasificador de Animales con Inteligencia Artificial</h2>
+            <p>Sube una imagen de cualquier animal y nuestro sistema de IA lo identificará automáticamente con una precisión superior al 95%.</p>
+        </div>
+    </section>
+
+    <!-- Upload Section -->
+    <section class="upload-section" id="clasificar">
+        <div class="container">
+            <div class="upload-container">
+                <h2 class="section-title">Clasificar Imagen</h2>
+                <form id="uploadForm" enctype="multipart/form-data">
+                    <div class="upload-area" id="uploadArea">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <h3>Arrastra y suelta una imagen aquí</h3>
+                        <p>o</p>
+                        <input type="file" id="fileInput" class="file-input" name="file" accept="image/*" required>
+                        <label for="fileInput" class="file-label">Seleccionar archivo</label>
+                    </div>
+                    <div class="selected-file" id="selectedFile">
+                        <i class="fas fa-file-image"></i>
+                        <span id="fileName">imagen_ejemplo.jpg</span>
+                    </div>
+                    <div class="spinner" id="spinner">
+                        <i class="fas fa-spinner"></i>
+                        <p>Procesando imagen...</p>
+                    </div>
+                    <button type="submit" class="classify-btn" id="classifyBtn" disabled>Clasificar Animal</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results Section -->
+    <section class="results-section" id="resultsSection">
+        <div class="container">
+            <div class="results-header">
+                <h2>Resultados de la Clasificación</h2>
+                <button class="file-label" id="newClassification">
+                    <i class="fas fa-plus"></i> Nueva Clasificación
+                </button>
+            </div>
+            <img src="" alt="Animal clasificado" class="animal-image" id="animalImage">
+            <div id="resultsContent">
+                <!-- Los resultados se mostrarán aquí -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Info Section -->
+    <section class="info-section" id="informacion">
+        <div class="container">
+            <div class="section-title">
+                <h2>¿Cómo funciona nuestro clasificador?</h2>
+                <p>Nuestro sistema utiliza algoritmos avanzados de aprendizaje automático para identificar y clasificar animales en imágenes con una precisión excepcional.</p>
+            </div>
+            
+            <div class="features">
+                <div class="feature-card">
+                    <i class="fas fa-brain"></i>
+                    <h3>Red Neuronal Profunda</h3>
+                    <p>Utilizamos una arquitectura de red neuronal convolucional (CNN) entrenada con más de 1 millón de imágenes de animales.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-bolt"></i>
+                    <h3>Procesamiento Rápido</h3>
+                    <p>Obtén resultados en menos de 3 segundos gracias a nuestra infraestructura optimizada y algoritmos eficientes.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-database"></i>
+                    <h3>Base de Datos Amplia</h3>
+                    <p>Reconocemos más de 500 especies diferentes de mamíferos, aves, reptiles, anfibios y peces.</p>
+                </div>
+            </div>
+            
+            <div class="section-title">
+                <h2>Animales que podemos identificar</h2>
+                <p>Nuestro sistema está entrenado para reconocer una amplia variedad de animales de diferentes hábitats y características.</p>
+            </div>
+            
+            <div class="animal-gallery">
+
+                <!-- Perro -->
+                <div class="animal-card">
+                    <img src="https://images.unsplash.com/photo-1507146426996-ef05306b995a?auto=format&fit=crop&w=500&q=80" alt="Perro">
+                    <div class="card-content">
+                        <h4>Perro</h4>
+                        <p>Mamífero doméstico muy popular por su compañía y lealtad.</p>
+                    </div>
+                </div>
+
+                <!-- Caballo -->
+                <div class="animal-card">
+                    <img src="https://images.unsplash.com/photo-1553284965-fa61e9ad4795?q=80&w=1742&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Caballo">
+                    <div class="card-content">
+                        <h4>Caballo</h4>
+                        <p>Mamífero herbívoro usado históricamente para transporte y trabajo.</p>
+                    </div>
+                </div>
+
+                <!-- Elefante -->
+                <div class="animal-card">
+                    <img src="https://plus.unsplash.com/premium_photo-1661810056990-57be781caa2d?q=80&w=1742&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Elefante">
+                    <div class="card-content">
+                        <h4>Elefante</h4>
+                        <p>El mayor mamífero terrestre, reconocido por su trompa.</p>
+                    </div>
+                </div>
+
+                <!-- Mariposa -->
+                <div class="animal-card">
+                    <img src="https://plus.unsplash.com/premium_photo-1698524612460-32d35c637488?q=80&w=1778&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Mariposa">
+                    <div class="card-content">
+                        <h4>Mariposa</h4>
+                        <p>Insecto conocido por sus alas coloridas y delicadas.</p>
+                    </div>
+                </div>
+
+                <!-- Gallina -->
+                <div class="animal-card">
+                    <img src="https://images.unsplash.com/photo-1580866177074-5c0b1b924d32?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Gallina">
+                    <div class="card-content">
+                        <h4>Gallina</h4>
+                        <p>Ave doméstica criada para producir huevos y carne.</p>
+                    </div>
+                </div>
+
+                <!-- Gato -->
+                <div class="animal-card">
+                    <img src="https://images.unsplash.com/photo-1518791841217-8f162f1e1131?auto=format&fit=crop&w=500&q=80" alt="Gato">
+                    <div class="card-content">
+                        <h4>Gato</h4>
+                        <p>Mamífero doméstico independiente y ágil, muy popular como mascota.</p>
+                    </div>
+                </div>
+
+                <!-- Vaca -->
+                <div class="animal-card">
+                    <img src="https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Vaca">
+                    <div class="card-content">
+                        <h4>Vaca</h4>
+                        <p>Mamífero rumiante criado para la producción de leche y carne.</p>
+                    </div>
+                </div>
+
+                <!-- Oveja -->
+                <div class="animal-card">
+                    <img src="https://images.unsplash.com/photo-1588942173353-0c53a1bf9081?q=80&w=872&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Oveja">
+                    <div class="card-content">
+                        <h4>Oveja</h4>
+                        <p>Mamífero domesticado conocido por su lana.</p>
+                    </div>
+                </div>
+
+                <!-- Araña -->
+                <div class="animal-card">
+                    <img src="https://images.unsplash.com/photo-1544717455-4cf7ad978978?q=80&w=1374&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Araña">
+                    <div class="card-content">
+                        <h4>Araña</h4>
+                        <p>Arácnido que produce seda para tejer telarañas y cazar.</p>
+                    </div>
+                </div>
+
+                <!-- Ardilla -->
+                <div class="animal-card">
+                    <img src="https://plus.unsplash.com/premium_photo-1673709359598-db2868b023f6?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Ardilla">
+                    <div class="card-content">
+                        <h4>Ardilla</h4>
+                        <p>Pequeño roedor ágil que suele vivir en árboles.</p>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section" id="estadisticas">
+        <div class="container">
+            <div class="section-title">
+                <h2>Estadísticas de Nuestro Sistema</h2>
+                <p>Datos actualizados sobre el rendimiento y uso de nuestro clasificador de animales.</p>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="fas fa-images"></i>
+                    <div class="number">1.2M</div>
+                    <div class="label">Imágenes Analizadas</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-paw"></i>
+                    <div class="number">10</div>
+                    <div class="label">Especies Identificadas</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-chart-line"></i>
+                    <div class="number">96.7%</div>
+                    <div class="label">Precisión del Sistema</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-users"></i>
+                    <div class="number">45K</div>
+                    <div class="label">Usuarios Activos</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Clasificador de Animales</h3>
+                    <p>Sistema avanzado de identificación de animales mediante inteligencia artificial y aprendizaje automático.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Enlaces Rápidos</h3>
+                    <ul>
+                        <li><a href="#inicio">Inicio</a></li>
+                        <li><a href="#clasificar">Clasificar Animal</a></li>
+                        <li><a href="#informacion">Cómo Funciona</a></li>
+                        <li><a href="#estadisticas">Estadísticas</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Recursos</h3>
+                    <ul>
+                        <li><a href="#">Documentación</a></li>
+                        <li><a href="#">API para Desarrolladores</a></li>
+                        <li><a href="#">Base de Datos de Animales</a></li>
+                        <li><a href="#">Centro de Ayuda</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contacto</h3>
+                    <ul>
+                        <li><i class="fas fa-envelope"></i> info@clasificadoranimales.com</li>
+                        <li><i class="fas fa-phone"></i> +34 912 345 678</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Madrid, España</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 Clasificador de Animales. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const fileInput = document.getElementById('fileInput');
+        const uploadArea = document.getElementById('uploadArea');
+        const selectedFile = document.getElementById('selectedFile');
+        const fileName = document.getElementById('fileName');
+        const classifyBtn = document.getElementById('classifyBtn');
+        const uploadForm = document.getElementById('uploadForm');
+        const spinner = document.getElementById('spinner');
+        const resultsSection = document.getElementById('resultsSection');
+        const animalImage = document.getElementById('animalImage');
+        const resultsContent = document.getElementById('resultsContent');
+        const newClassificationBtn = document.getElementById('newClassification');
+
+        // Traducción de clases a español
+        const animalNames = {
+            "dog": "Perro",
+            "horse": "Caballo", 
+            "elephant": "Elefante",
+            "butterfly": "Mariposa",
+            "chicken": "Gallina",
+            "cat": "Gato",
+            "cow": "Vaca",
+            "sheep": "Oveja",
+            "spider": "Araña",
+            "squirrel": "Ardilla"
+        };
+
+        // Selección de archivo
+        fileInput.addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                const file = e.target.files[0];
+                fileName.textContent = file.name;
+                selectedFile.classList.add('active');
+                classifyBtn.disabled = false;
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    animalImage.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Drag & Drop
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            uploadArea.style.backgroundColor = '#e6eeff';
+        });
+
+        uploadArea.addEventListener('dragleave', function() {
+            uploadArea.style.backgroundColor = '#f8faff';
+        });
+
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            uploadArea.style.backgroundColor = '#f8faff';
+
+            if (e.dataTransfer.files.length > 0) {
+                fileInput.files = e.dataTransfer.files;
+                const event = new Event('change');
+                fileInput.dispatchEvent(event);
+            }
+        });
+
+        // Enviar imagen a Flask
+        uploadForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            if (!fileInput.files.length) return;
+
+            spinner.classList.add('active');
+            classifyBtn.disabled = true;
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) throw new Error("Error del servidor");
+                return response.json();      // ← ← ← CAMBIO IMPORTANTE
+            })
+            .then(data => {
+                spinner.classList.remove('active');
+                displayResults(data);
+                resultsSection.classList.add('active');
+                resultsSection.scrollIntoView({ behavior: "smooth" });
+            })
+            .catch(error => {
+                spinner.classList.remove('active');
+                classifyBtn.disabled = false;
+                displayError("Hubo un error: " + error.message);
+                resultsSection.classList.add('active');
+                resultsSection.scrollIntoView({ behavior: "smooth" });
+            });
+        });
+
+        // Mostrar resultados
+        function displayResults(data) {
+            const animal = data.prediction.toLowerCase();
+            const confidence = parseFloat(data.confidence);
+            const confidencePercent = (confidence * 100).toFixed(1);
+            const animalSpanish = animalNames[animal] || animal;
+
+            resultsContent.innerHTML = `
+                <div class="prediction-result">
+                    <div class="prediction-label">${animalSpanish}</div>
+                    <div class="prediction-confidence">Confianza: ${confidencePercent}%</div>
+                    <div class="confidence-badge">
+                        ${confidence > 0.8 ? "Alta confianza" : confidence > 0.6 ? "Confianza media" : "Confianza baja"}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Mostrar errores
+        function displayError(message) {
+            resultsContent.innerHTML = `
+                <div class="error-message">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h3>Error</h3>
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+
+        // Nueva clasificación
+        newClassificationBtn.addEventListener('click', function() {
+            fileInput.value = "";
+            selectedFile.classList.remove("active");
+            resultsSection.classList.remove("active");
+            classifyBtn.disabled = true;
+            spinner.classList.remove('active');
+            document.getElementById('clasificar').scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+    </script>
+
+</body>
+</html>
